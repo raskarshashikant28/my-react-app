@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { fetchAllUsers, saveUserGlobally } from './globalDB';
 
-
-
 function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [users, setUsers] = useState([]);
@@ -22,18 +20,15 @@ function App() {
     });
   };
 
-  // Fetch users from truly global database
   const fetchUsers = async () => {
     const users = await fetchAllUsers();
     setUsers(users);
   };
 
-  // Save user to truly global database
   const saveUser = async (userData) => {
     return await saveUserGlobally(userData);
   };
 
-  // Edit user
   const handleEdit = (user) => {
     setEditingUser(user);
     setFormData({
@@ -44,7 +39,6 @@ function App() {
     setActiveTab('form');
   };
 
-  // Delete user with confirmation
   const handleDelete = (user) => {
     if (window.confirm(`Are you sure you want to delete ${user.username}?`)) {
       const updatedUsers = users.filter(u => u.id !== user.id);
@@ -53,7 +47,6 @@ function App() {
     }
   };
 
-  // Load users when app starts
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -64,7 +57,6 @@ function App() {
       setLoading(true);
       
       if (editingUser) {
-        // Update existing user
         const updatedUsers = users.map(user => 
           user.id === editingUser.id 
             ? { ...user, ...formData }
@@ -74,7 +66,6 @@ function App() {
         setEditingUser(null);
         console.log('✅ User updated!');
       } else {
-        // Add new user
         const newUser = await saveUser(formData);
         setUsers([...users, newUser]);
       }
@@ -115,7 +106,7 @@ function App() {
                 />
               </div>
               <div className="form-group">
-                <label>My Mobile Number:</label>
+                <label>Mobile Number:</label>
                 <input
                   type="tel"
                   name="mobile"
@@ -184,7 +175,7 @@ function App() {
                       </button>
                     </div>
                   </div>
-                ))
+                ))}
               </div>
             )}
           </div>
