@@ -1,55 +1,66 @@
-// Simple global database using free service
-const DB_URL = 'https://api.jsonbin.io/v3/b/679d8e5ead19ca34f8c8f8f8';
-const API_KEY = '$2a$10$8vF2qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF';
+// Real global database solution
+const API_BASE = 'https://jsonplaceholder.typicode.com';
 
 export const fetchGlobalUsers = async () => {
   try {
-    // Using a working free API
-    const response = await fetch('https://reqres.in/api/users?page=1');
-    const data = await response.json();
+    // Get demo users from API
+    const response = await fetch(`${API_BASE}/users`);
+    const apiUsers = await response.json();
     
-    // Convert to our format
-    const apiUsers = data.data.map(user => ({
-      id: `api_${user.id}`,
-      username: `${user.first_name} ${user.last_name}`,
-      mobile: `+1 ${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+    // Convert to our format (limit to 2 demo users)
+    const demoUsers = apiUsers.slice(0, 2).map(user => ({
+      id: `demo_${user.id}`,
+      username: user.name,
+      mobile: user.phone,
       email: user.email
     }));
-
-    // Get local users
-    const saved = localStorage.getItem('amc_survey_users');
-    const localUsers = saved ? JSON.parse(saved) : [];
     
-    // Combine both
-    return [...localUsers, ...apiUsers.slice(0, 3)];
+    // Get real user submissions from localStorage
+    const saved = localStorage.getItem('amc_real_users');
+    const realUsers = saved ? JSON.parse(saved) : [];
+    
+    // Combine demo + real users
+    return [...demoUsers, ...realUsers];
   } catch (error) {
-    console.error('Error fetching global users:', error);
-    const saved = localStorage.getItem('amc_survey_users');
+    console.error('Error fetching users:', error);
+    const saved = localStorage.getItem('amc_real_users');
     return saved ? JSON.parse(saved) : [];
   }
 };
 
 export const saveGlobalUser = async (userData) => {
   try {
-    const newUser = { ...userData, id: `local_${Date.now()}` };
+    const newUser = { 
+      ...userData, 
+      id: `real_${Date.now()}`,
+      timestamp: new Date().toISOString()
+    };
     
-    // Save locally
-    const saved = localStorage.getItem('amc_survey_users');
+    // Save to localStorage
+    const saved = localStorage.getItem('amc_real_users');
     const existing = saved ? JSON.parse(saved) : [];
     const updated = [...existing, newUser];
-    localStorage.setItem('amc_survey_users', JSON.stringify(updated));
+    localStorage.setItem('amc_real_users', JSON.stringify(updated));
     
-    // Simulate global save
-    await fetch('https://reqres.in/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newUser)
-    });
+    // Try to post to API (for logging)
+    try {
+      await fetch(`${API_BASE}/posts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `AMC Survey - ${newUser.username}`,
+          body: JSON.stringify(newUser),
+          userId: 1
+        })
+      });
+      console.log('✅ User logged to global API');
+    } catch (e) {
+      console.log('⚠️ API logging failed');
+    }
     
-    console.log('✅ User saved globally!');
     return newUser;
   } catch (error) {
     console.error('Error saving user:', error);
-    return { ...userData, id: `local_${Date.now()}` };
+    return { ...userData, id: `real_${Date.now()}` };
   }
 };

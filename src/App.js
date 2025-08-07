@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { fetchGlobalUsers, saveGlobalUser } from './database';
+import { fetchAllUsers, saveUserGlobally } from './globalDB';
 
 
 
@@ -21,15 +21,15 @@ function App() {
     });
   };
 
-  // Fetch users from global database
+  // Fetch users from truly global database
   const fetchUsers = async () => {
-    const users = await fetchGlobalUsers();
+    const users = await fetchAllUsers();
     setUsers(users);
   };
 
-  // Save user to global database
+  // Save user to truly global database
   const saveUser = async (userData) => {
-    return await saveGlobalUser(userData);
+    return await saveUserGlobally(userData);
   };
 
   // Load users when app starts
@@ -52,13 +52,13 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>my-first-app</h1>
+        <h1>AMC Survey Portal</h1>
       </header>
 
       <main className="content">
         {activeTab === 'home' && (
           <div className="home">
-            <h1>Welcome to my-first-app</h1>
+            <h1>Welcome to AMC Survey Portal</h1>
             <p>Use the tabs above to navigate between form and view sections.</p>
             <p><small>🌍 Global Survey Portal - Data shared worldwide!</small></p>
           </div>
