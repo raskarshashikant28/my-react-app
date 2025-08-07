@@ -13,6 +13,7 @@ function App() {
     mobile: '',
     email: ''
   });
+  const [editingUser, setEditingUser] = useState(null);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -32,6 +33,26 @@ function App() {
     return await saveUserGlobally(userData);
   };
 
+  // Edit user
+  const handleEdit = (user) => {
+    setEditingUser(user);
+    setFormData({
+      username: user.username,
+      mobile: user.mobile,
+      email: user.email || ''
+    });
+    setActiveTab('form');
+  };
+
+  // Delete user with confirmation
+  const handleDelete = (user) => {
+    if (window.confirm(`Are you sure you want to delete ${user.username}?`)) {
+      const updatedUsers = users.filter(u => u.id !== user.id);
+      setUsers(updatedUsers);
+      console.log('✅ User deleted:', user.username);
+    }
+  };
+
   // Load users when app starts
   useEffect(() => {
     fetchUsers();
@@ -41,8 +62,23 @@ function App() {
     e.preventDefault();
     if (formData.username && formData.mobile) {
       setLoading(true);
-      const newUser = await saveUser(formData);
-      setUsers([...users, newUser]);
+      
+      if (editingUser) {
+        // Update existing user
+        const updatedUsers = users.map(user => 
+          user.id === editingUser.id 
+            ? { ...user, ...formData }
+            : user
+        );
+        setUsers(updatedUsers);
+        setEditingUser(null);
+        console.log('✅ User updated!');
+      } else {
+        // Add new user
+        const newUser = await saveUser(formData);
+        setUsers([...users, newUser]);
+      }
+      
       setFormData({ username: '', mobile: '', email: '' });
       setActiveTab('view');
       setLoading(false);
@@ -66,7 +102,7 @@ function App() {
 
         {activeTab === 'form' && (
           <div className="form-section">
-            <h2>User Form</h2>
+            <h2>{editingUser ? 'Edit User' : 'User Form'}</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label>Username:</label>
@@ -98,8 +134,20 @@ function App() {
                 />
               </div>
               <button type="submit" disabled={loading}>
-                {loading ? 'Saving...' : 'Submit'}
+                {loading ? 'Saving...' : (editingUser ? 'Update' : 'Submit')}
               </button>
+              {editingUser && (
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setEditingUser(null);
+                    setFormData({ username: '', mobile: '', email: '' });
+                  }}
+                  style={{marginLeft: '10px', background: '#6c757d'}}
+                >
+                  Cancel
+                </button>
+              )}
             </form>
           </div>
         )}
@@ -116,11 +164,27 @@ function App() {
               <div className="user-list">
                 {users.map(user => (
                   <div key={user.id} className="user-card">
-                    <h3>{user.username}</h3>
-                    <p>Mobile: {user.mobile}</p>
-                    {user.email && <p>Email: {user.email}</p>}
+                    <div className="user-info">
+                      <h3>{user.username}</h3>
+                      <p>Mobile: {user.mobile}</p>
+                      {user.email && <p>Email: {user.email}</p>}
+                    </div>
+                    <div className="user-actions">
+                      <button 
+                        onClick={() => handleEdit(user)}
+                        className="edit-btn"
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(user)}
+                        className="delete-btn"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </div>
                   </div>
-                ))}
+                ))
               </div>
             )}
           </div>
