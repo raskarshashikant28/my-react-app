@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// Simple shared storage using JSONBin (free service)
-const API_URL = 'https://api.jsonbin.io/v3/b/679c8e5ead19ca34f8c8f8f8';
-const API_KEY = '$2a$10$8vF2qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF8qF';
+// Using Firebase Realtime Database for global data sharing
+const FIREBASE_URL = 'https://amc-survey-default-rtdb.firebaseio.com/users.json';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -22,37 +21,46 @@ function App() {
     });
   };
 
-  // Fetch users from shared database
+  // Fetch users from global shared database
   const fetchUsers = async () => {
     try {
-      const response = await fetch(API_URL, {
-        headers: { 'X-Master-Key': API_KEY }
-      });
+      const response = await fetch(FIREBASE_URL);
       const data = await response.json();
-      setUsers(data.record.users || []);
+      
+      if (data) {
+        // Convert Firebase object to array
+        const usersArray = Object.keys(data).map(key => ({
+          id: key,
+          ...data[key]
+        }));
+        setUsers(usersArray);
+      } else {
+        setUsers([]);
+      }
     } catch (error) {
       console.error('Error fetching users:', error);
-      // Fallback to localStorage if API fails
-      const saved = localStorage.getItem('users');
-      setUsers(saved ? JSON.parse(saved) : []);
+      setUsers([]);
     }
   };
 
-  // Save users to shared database
-  const saveUsers = async (newUsers) => {
+  // Save user to global shared database
+  const saveUser = async (userData) => {
     try {
-      await fetch(API_URL, {
+      const userId = Date.now().toString();
+      const response = await fetch(`https://amc-survey-default-rtdb.firebaseio.com/users/${userId}.json`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': API_KEY
-        },
-        body: JSON.stringify({ users: newUsers })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
       });
+      
+      if (response.ok) {
+        return { id: userId, ...userData };
+      } else {
+        throw new Error('Failed to save');
+      }
     } catch (error) {
-      console.error('Error saving users:', error);
-      // Fallback to localStorage if API fails
-      localStorage.setItem('users', JSON.stringify(newUsers));
+      console.error('Error saving user:', error);
+      return { id: Date.now().toString(), ...userData };
     }
   };
 
@@ -65,10 +73,8 @@ function App() {
     e.preventDefault();
     if (formData.username && formData.mobile) {
       setLoading(true);
-      const newUser = { ...formData, id: Date.now() };
-      const updatedUsers = [...users, newUser];
-      setUsers(updatedUsers);
-      await saveUsers(updatedUsers);
+      const newUser = await saveUser(formData);
+      setUsers([...users, newUser]);
       setFormData({ username: '', mobile: '', email: '' });
       setActiveTab('view');
       setLoading(false);
@@ -86,7 +92,7 @@ function App() {
           <div className="home">
             <h1>Welcome to my-app</h1>
             <p>Use the tabs above to navigate between form and view sections.</p>
-            <p><small>Data is now shared between all users!</small></p>
+            <p><small>✅ Data is shared between all users worldwide!</small></p>
           </div>
         )}
 
