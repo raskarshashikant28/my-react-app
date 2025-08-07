@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// Using real global database for sharing data between all users
-const API_BASE = 'https://api.restful-api.dev/objects';
+// Using deployed backend for global data sharing
+const API_URL = 'https://amc-survey-backend-production.up.railway.app/api/users';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -21,60 +21,44 @@ function App() {
     });
   };
 
-  // Fetch users from global shared database
+  // Fetch users from deployed backend
   const fetchUsers = async () => {
     try {
-      const response = await fetch(API_BASE);
+      const response = await fetch(API_URL);
       const data = await response.json();
-      
-      // Filter only AMC Survey entries
-      const amcUsers = data.filter(item => 
-        item.data && item.data.type === 'amc-survey'
-      ).map(item => ({
-        id: item.id,
-        username: item.data.username,
-        mobile: item.data.mobile,
-        email: item.data.email
-      }));
-      
-      setUsers(amcUsers);
+      setUsers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching users:', error);
-      setUsers([]);
+      // Fallback to localStorage
+      const saved = localStorage.getItem('amc_survey_backup');
+      setUsers(saved ? JSON.parse(saved) : []);
     }
   };
 
-  // Save user to global shared database
+  // Save user to deployed backend
   const saveUser = async (userData) => {
     try {
-      const payload = {
-        name: `AMC Survey - ${userData.username}`,
-        data: {
-          type: 'amc-survey',
-          username: userData.username,
-          mobile: userData.mobile,
-          email: userData.email,
-          timestamp: new Date().toISOString()
-        }
-      };
-      
-      const response = await fetch(API_BASE, {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(userData)
       });
+      const newUser = await response.json();
       
-      const result = await response.json();
+      // Also backup locally
+      const saved = localStorage.getItem('amc_survey_backup');
+      const existing = saved ? JSON.parse(saved) : [];
+      localStorage.setItem('amc_survey_backup', JSON.stringify([...existing, newUser]));
       
-      return {
-        id: result.id,
-        username: userData.username,
-        mobile: userData.mobile,
-        email: userData.email
-      };
+      return newUser;
     } catch (error) {
       console.error('Error saving user:', error);
-      return { id: Date.now().toString(), ...userData };
+      // Fallback to localStorage
+      const newUser = { ...userData, id: Date.now() };
+      const saved = localStorage.getItem('amc_survey_backup');
+      const existing = saved ? JSON.parse(saved) : [];
+      localStorage.setItem('amc_survey_backup', JSON.stringify([...existing, newUser]));
+      return newUser;
     }
   };
 
@@ -106,7 +90,7 @@ function App() {
           <div className="home">
             <h1>Welcome to my-app</h1>
             <p>Use the tabs above to navigate between form and view sections.</p>
-            <p><small>✅ Data is shared between all users worldwide!</small></p>
+            <p><small>🌍 Global Survey Portal - Data shared worldwide!</small></p>
           </div>
         )}
 
