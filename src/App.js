@@ -82,13 +82,13 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>my-app</h1>
+        <h1>my-first-app</h1>
       </header>
 
       <main className="content">
         {activeTab === 'home' && (
           <div className="home">
-            <h1>Welcome to my-app</h1>
+            <h1>Welcome to my-first-app</h1>
             <p>Use the tabs above to navigate between form and view sections.</p>
             <p><small>🌍 Global Survey Portal - Data shared worldwide!</small></p>
           </div>
