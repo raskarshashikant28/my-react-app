@@ -62,7 +62,7 @@ function App() {
       <div className="content">
         {activeTab === 'home' && (
           <div className="home">
-            <h1>Welcome to MyApp</h1>
+            <h1>Welcome to MyApp1</h1>
             <p>Use the tabs above to navigate between form and view sections.</p>
           </div>
         )}
