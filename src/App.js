@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import { fetchGlobalUsers, saveGlobalUser } from './database';
 
-// Using a working global database solution
-const API_URL = 'https://jsonplaceholder.typicode.com/users';
-const STORAGE_URL = 'https://api.jsonbin.io/v3/b/679d8e5ead19ca34f8c8f8f8';
-const API_KEY = '$2a$10$VQVjjXvY.N8rGzjjXvY.N8rGzjjXvY.N8rGzjjXvY.N8rGzjjXvY.N';
+
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -23,70 +21,15 @@ function App() {
     });
   };
 
-  // Fetch users from global storage
+  // Fetch users from global database
   const fetchUsers = async () => {
-    try {
-      // Using a simple approach with browser's shared storage
-      const response = await fetch('https://httpbin.org/get');
-      if (response.ok) {
-        // For now, use localStorage but with a shared key approach
-        const saved = localStorage.getItem('amc_global_survey');
-        const data = saved ? JSON.parse(saved) : [];
-        setUsers(data);
-        
-        // Also try to sync with other users' data
-        const allKeys = Object.keys(localStorage);
-        const surveyKeys = allKeys.filter(key => key.startsWith('amc_survey_'));
-        let allUsers = [];
-        surveyKeys.forEach(key => {
-          try {
-            const userData = JSON.parse(localStorage.getItem(key));
-            if (Array.isArray(userData)) {
-              allUsers = [...allUsers, ...userData];
-            }
-          } catch (e) {}
-        });
-        
-        if (allUsers.length > data.length) {
-          setUsers(allUsers);
-          localStorage.setItem('amc_global_survey', JSON.stringify(allUsers));
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      const saved = localStorage.getItem('amc_global_survey');
-      setUsers(saved ? JSON.parse(saved) : []);
-    }
+    const users = await fetchGlobalUsers();
+    setUsers(users);
   };
 
-  // Save user to global storage
+  // Save user to global database
   const saveUser = async (userData) => {
-    try {
-      const newUser = { ...userData, id: Date.now(), timestamp: new Date().toISOString() };
-      
-      // Save to multiple storage keys for better sharing
-      const saved = localStorage.getItem('amc_global_survey');
-      const existing = saved ? JSON.parse(saved) : [];
-      const updated = [...existing, newUser];
-      
-      localStorage.setItem('amc_global_survey', JSON.stringify(updated));
-      localStorage.setItem(`amc_survey_${Date.now()}`, JSON.stringify([newUser]));
-      
-      // Try to broadcast to other tabs/windows
-      try {
-        localStorage.setItem('amc_survey_update', JSON.stringify({
-          action: 'new_user',
-          user: newUser,
-          timestamp: Date.now()
-        }));
-        localStorage.removeItem('amc_survey_update');
-      } catch (e) {}
-      
-      return newUser;
-    } catch (error) {
-      console.error('Error saving user:', error);
-      return { ...userData, id: Date.now() };
-    }
+    return await saveGlobalUser(userData);
   };
 
   // Load users when app starts
