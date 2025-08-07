@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { fetchAllUsers, saveUserGlobally } from './globalDB';
+import { fetchAllUsers, saveUserGlobally, deleteUserGlobally, updateUserGlobally } from './globalDB';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -39,11 +39,14 @@ function App() {
     setActiveTab('form');
   };
 
-  const handleDelete = (user) => {
+  const handleDelete = async (user) => {
     if (window.confirm(`Are you sure you want to delete ${user.username}?`)) {
+      setLoading(true);
+      await deleteUserGlobally(user.id);
       const updatedUsers = users.filter(u => u.id !== user.id);
       setUsers(updatedUsers);
-      console.log('✅ User deleted:', user.username);
+      setLoading(false);
+      console.log('✅ User deleted globally:', user.username);
     }
   };
 
@@ -57,6 +60,7 @@ function App() {
       setLoading(true);
       
       if (editingUser) {
+        await updateUserGlobally(editingUser.id, formData);
         const updatedUsers = users.map(user => 
           user.id === editingUser.id 
             ? { ...user, ...formData }
@@ -64,7 +68,7 @@ function App() {
         );
         setUsers(updatedUsers);
         setEditingUser(null);
-        console.log('✅ User updated!');
+        console.log('✅ User updated globally!');
       } else {
         const newUser = await saveUser(formData);
         setUsers([...users, newUser]);
@@ -146,8 +150,8 @@ function App() {
         {activeTab === 'view' && (
           <div className="view-section">
             <h2>User Data</h2>
-            <button onClick={fetchUsers} style={{marginBottom: '10px'}}>
-              Refresh Data
+            <button onClick={fetchUsers} className="refresh-btn">
+              🔄 Refresh
             </button>
             {users.length === 0 ? (
               <p>No users added yet.</p>
@@ -164,14 +168,16 @@ function App() {
                       <button 
                         onClick={() => handleEdit(user)}
                         className="edit-btn"
+                        disabled={loading}
                       >
-                        ✏️ Edit
+                        ✏️
                       </button>
                       <button 
                         onClick={() => handleDelete(user)}
                         className="delete-btn"
+                        disabled={loading}
                       >
-                        🗑️ Delete
+                        🗑️
                       </button>
                     </div>
                   </div>
@@ -194,15 +200,15 @@ function App() {
           className={`nav-btn ${activeTab === 'form' ? 'active' : ''}`} 
           onClick={() => setActiveTab('form')}
         >
-          <span className="icon">📝</span>
-          <span className="label">Form</span>
+          <span className="icon">➕</span>
+          <span className="label">Add</span>
         </button>
         <button 
           className={`nav-btn ${activeTab === 'view' ? 'active' : ''}`} 
           onClick={() => setActiveTab('view')}
         >
-          <span className="icon">👥</span>
-          <span className="label">View</span>
+          <span className="icon">📋</span>
+          <span className="label">List</span>
         </button>
       </nav>
     </div>

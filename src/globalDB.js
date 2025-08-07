@@ -42,3 +42,33 @@ export const saveUserGlobally = async (userData) => {
     return newUser;
   }
 };
+
+export const deleteUserGlobally = async (userId) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/${userId}`, {
+      method: 'DELETE'
+    });
+    
+    if (response.ok) {
+      console.log('✅ Deleted from global database!');
+    }
+  } catch (error) {
+    console.error('Error deleting user:', error);
+  }
+};
+
+export const updateUserGlobally = async (userId, userData) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/${userId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    });
+    
+    if (response.ok) {
+      console.log('✅ Updated in global database!');
+    }
+  } catch (error) {
+    console.error('Error updating user:', error);
+  }
+};
