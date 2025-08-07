@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// Using deployed backend for global data sharing
-const API_URL = 'https://amc-survey-backend-production.up.railway.app/api/users';
+// Using your Railway deployed backend for global data sharing
+const API_URL = 'https://my-react-app-production-7546.up.railway.app/api/users';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
