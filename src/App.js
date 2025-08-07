@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// Using Firebase Realtime Database for global data sharing
-const FIREBASE_URL = 'https://amc-survey-default-rtdb.firebaseio.com/users.json';
+// Using real global database for sharing data between all users
+const API_BASE = 'https://api.restful-api.dev/objects';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -24,19 +24,20 @@ function App() {
   // Fetch users from global shared database
   const fetchUsers = async () => {
     try {
-      const response = await fetch(FIREBASE_URL);
+      const response = await fetch(API_BASE);
       const data = await response.json();
       
-      if (data) {
-        // Convert Firebase object to array
-        const usersArray = Object.keys(data).map(key => ({
-          id: key,
-          ...data[key]
-        }));
-        setUsers(usersArray);
-      } else {
-        setUsers([]);
-      }
+      // Filter only AMC Survey entries
+      const amcUsers = data.filter(item => 
+        item.data && item.data.type === 'amc-survey'
+      ).map(item => ({
+        id: item.id,
+        username: item.data.username,
+        mobile: item.data.mobile,
+        email: item.data.email
+      }));
+      
+      setUsers(amcUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
       setUsers([]);
@@ -46,18 +47,31 @@ function App() {
   // Save user to global shared database
   const saveUser = async (userData) => {
     try {
-      const userId = Date.now().toString();
-      const response = await fetch(`https://amc-survey-default-rtdb.firebaseio.com/users/${userId}.json`, {
-        method: 'PUT',
+      const payload = {
+        name: `AMC Survey - ${userData.username}`,
+        data: {
+          type: 'amc-survey',
+          username: userData.username,
+          mobile: userData.mobile,
+          email: userData.email,
+          timestamp: new Date().toISOString()
+        }
+      };
+      
+      const response = await fetch(API_BASE, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
+        body: JSON.stringify(payload)
       });
       
-      if (response.ok) {
-        return { id: userId, ...userData };
-      } else {
-        throw new Error('Failed to save');
-      }
+      const result = await response.json();
+      
+      return {
+        id: result.id,
+        username: userData.username,
+        mobile: userData.mobile,
+        email: userData.email
+      };
     } catch (error) {
       console.error('Error saving user:', error);
       return { id: Date.now().toString(), ...userData };
