@@ -12,6 +12,53 @@ function App() {
     email: ''
   });
   const [editingUser, setEditingUser] = useState(null);
+  const [showDeletePopup, setShowDeletePopup] = useState(null);
+  const [language, setLanguage] = useState('en');
+
+  const texts = {
+    en: {
+      welcome: 'Welcome to Survey App',
+      description: 'Complete surveys and view responses from all participants',
+      username: 'Full Name',
+      mobile: 'Mobile Number',
+      email: 'Email Address',
+      submit: 'Submit Survey',
+      update: 'Update Response',
+      cancel: 'Cancel',
+      home: 'Home',
+      survey: 'Survey',
+      responses: 'Responses',
+      editUser: 'Edit Response',
+      surveyForm: 'Survey Form',
+      responseData: 'Survey Responses',
+      deleteConfirm: 'Are you sure you want to delete this response?',
+      deleteTitle: 'Delete Response',
+      yes: 'Yes, Delete',
+      no: 'Cancel'
+    },
+    mr: {
+      welcome: 'सर्वेक्षण अॅपमध्ये आपले स्वागत आहे',
+      description: 'सर्वेक्षण पूर्ण करा आणि सर्व सहभागींचे प्रतिसाद पहा',
+      username: 'पूर्ण नाव',
+      mobile: 'मोबाइल नंबर',
+      email: 'ईमेल पत्ता',
+      submit: 'सर्वेक्षण सबमिट करा',
+      update: 'प्रतिसाद अपडेट करा',
+      cancel: 'रद्द करा',
+      home: 'होम',
+      survey: 'सर्वेक्षण',
+      responses: 'प्रतिसाद',
+      editUser: 'प्रतिसाद संपादित करा',
+      surveyForm: 'सर्वेक्षण फॉर्म',
+      responseData: 'सर्वेक्षण प्रतिसाद',
+      deleteConfirm: 'तुम्हाला खात्री आहे की तुम्ही हा प्रतिसाद हटवू इच्छिता?',
+      deleteTitle: 'प्रतिसाद हटवा',
+      yes: 'होय, हटवा',
+      no: 'रद्द करा'
+    }
+  };
+
+  const t = texts[language];
 
   const handleInputChange = (e) => {
     setFormData({
@@ -40,13 +87,18 @@ function App() {
   };
 
   const handleDelete = async (user) => {
-    if (window.confirm(`Are you sure you want to delete ${user.username}?`)) {
+    setShowDeletePopup(user);
+  };
+
+  const confirmDelete = async () => {
+    if (showDeletePopup) {
       setLoading(true);
-      await deleteUserGlobally(user.id);
-      const updatedUsers = users.filter(u => u.id !== user.id);
+      await deleteUserGlobally(showDeletePopup.id);
+      const updatedUsers = users.filter(u => u.id !== showDeletePopup.id);
       setUsers(updatedUsers);
+      setShowDeletePopup(null);
       setLoading(false);
-      console.log('✅ User deleted globally:', user.username);
+      console.log('✅ User deleted globally:', showDeletePopup.username);
     }
   };
 
@@ -83,24 +135,52 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>My App</h1>
+        <div className="header-content">
+          <h1>📊 Survey App</h1>
+          <div className="language-toggle">
+            <button 
+              className={language === 'en' ? 'active' : ''}
+              onClick={() => setLanguage('en')}
+            >
+              EN
+            </button>
+            <button 
+              className={language === 'mr' ? 'active' : ''}
+              onClick={() => setLanguage('mr')}
+            >
+              मर
+            </button>
+          </div>
+        </div>
       </header>
 
       <main className="content">
         {activeTab === 'home' && (
           <div className="home">
-            <h1>Welcome to My App</h1>
-            <p>Use the tabs above to navigate between form and view sections.</p>
-            <p><small>🌍 Global App - Data shared worldwide!</small></p>
+            <div className="welcome-content">
+              <div className="survey-icon">📋</div>
+              <h1>{t.welcome}</h1>
+              <p>{t.description}</p>
+              <div className="stats">
+                <div className="stat-item">
+                  <span className="stat-number">{users.length}</span>
+                  <span className="stat-label">Total Responses</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-number">🌍</span>
+                  <span className="stat-label">Global Survey</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
         {activeTab === 'form' && (
           <div className="form-section">
-            <h2>{editingUser ? 'Edit User' : 'User Form'}</h2>
+            <h2>{editingUser ? t.editUser : t.surveyForm}</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label>Username:</label>
+                <label>{t.username}:</label>
                 <input
                   type="text"
                   name="username"
@@ -110,7 +190,7 @@ function App() {
                 />
               </div>
               <div className="form-group">
-                <label>Mobile Number:</label>
+                <label>{t.mobile}:</label>
                 <input
                   type="tel"
                   name="mobile"
@@ -120,7 +200,7 @@ function App() {
                 />
               </div>
               <div className="form-group">
-                <label>Email:</label>
+                <label>{t.email}:</label>
                 <input
                   type="email"
                   name="email"
@@ -129,7 +209,7 @@ function App() {
                 />
               </div>
               <button type="submit" disabled={loading}>
-                {loading ? 'Saving...' : (editingUser ? 'Update' : 'Submit')}
+                {loading ? '⏳' : (editingUser ? t.update : t.submit)}
               </button>
               {editingUser && (
                 <button 
@@ -140,7 +220,7 @@ function App() {
                   }}
                   style={{marginLeft: '10px', background: '#6c757d'}}
                 >
-                  Cancel
+                  {t.cancel}
                 </button>
               )}
             </form>
@@ -149,43 +229,38 @@ function App() {
 
         {activeTab === 'view' && (
           <div className="view-section">
-            <h2>User Data</h2>
-            <button onClick={fetchUsers} className="refresh-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-              </svg>
-              Refresh
-            </button>
+            <div className="view-header">
+              <h2>{t.responseData}</h2>
+              <span onClick={fetchUsers} className="refresh-icon" title="Refresh">
+                🔄
+              </span>
+            </div>
             {users.length === 0 ? (
-              <p>No users added yet.</p>
+              <div className="no-data">
+                <div className="no-data-icon">📝</div>
+                <p>No survey responses yet</p>
+                <p><small>Be the first to complete the survey!</small></p>
+              </div>
             ) : (
               <div className="user-list">
                 {users.map(user => (
-                  <div key={user.id} className="user-card">
-                    <div className="user-info">
-                      <h3>{user.username}</h3>
-                      <p>Mobile: {user.mobile}</p>
-                      {user.email && <p>Email: {user.email}</p>}
-                    </div>
-                    <div className="user-actions">
-                      <span 
-                        onClick={() => handleEdit(user)}
-                        className="edit-icon"
-                        title="Edit User"
-                      >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                        </svg>
-                      </span>
-                      <span 
-                        onClick={() => handleDelete(user)}
-                        className="delete-icon"
-                        title="Delete User"
-                      >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                        </svg>
-                      </span>
+                  <div key={user.id} className="response-card">
+                    <div className="response-info">
+                      <div className="response-header">
+                        <h3>{user.username}</h3>
+                        <div className="response-actions">
+                          <span onClick={() => handleEdit(user)} className="edit-icon" title="Edit">
+                            ✏️
+                          </span>
+                          <span onClick={() => handleDelete(user)} className="delete-icon" title="Delete">
+                            🗑️
+                          </span>
+                        </div>
+                      </div>
+                      <div className="response-details">
+                        <p>📱 {user.mobile}</p>
+                        {user.email && <p>📧 {user.email}</p>}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -200,36 +275,46 @@ function App() {
           className={`nav-btn ${activeTab === 'home' ? 'active' : ''}`} 
           onClick={() => setActiveTab('home')}
         >
-          <span className="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-            </svg>
-          </span>
-          <span className="label">Home</span>
+          <span className="icon">🏠</span>
+          <span className="label">{t.home}</span>
         </button>
         <button 
           className={`nav-btn ${activeTab === 'form' ? 'active' : ''}`} 
           onClick={() => setActiveTab('form')}
         >
-          <span className="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-            </svg>
-          </span>
-          <span className="label">Add</span>
+          <span className="icon">📝</span>
+          <span className="label">{t.survey}</span>
         </button>
         <button 
           className={`nav-btn ${activeTab === 'view' ? 'active' : ''}`} 
           onClick={() => setActiveTab('view')}
         >
-          <span className="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-            </svg>
-          </span>
-          <span className="label">List</span>
+          <span className="icon">📊</span>
+          <span className="label">{t.responses}</span>
         </button>
       </nav>
+
+      {showDeletePopup && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <div className="popup-header">
+              <h3>{t.deleteTitle}</h3>
+            </div>
+            <div className="popup-content">
+              <p>{t.deleteConfirm}</p>
+              <p><strong>{showDeletePopup.username}</strong></p>
+            </div>
+            <div className="popup-actions">
+              <button onClick={() => setShowDeletePopup(null)} className="cancel-btn">
+                {t.no}
+              </button>
+              <button onClick={confirmDelete} className="delete-btn" disabled={loading}>
+                {loading ? '⏳' : t.yes}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
