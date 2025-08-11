@@ -83,15 +83,15 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>AMC Survey Portal</h1>
+        <h1>My App</h1>
       </header>
 
       <main className="content">
         {activeTab === 'home' && (
           <div className="home">
-            <h1>Welcome to AMC Survey Portal</h1>
+            <h1>Welcome to My App</h1>
             <p>Use the tabs above to navigate between form and view sections.</p>
-            <p><small>🌍 Global Survey Portal - Data shared worldwide!</small></p>
+            <p><small>🌍 Global App - Data shared worldwide!</small></p>
           </div>
         )}
 
@@ -168,26 +168,24 @@ function App() {
                       {user.email && <p>Email: {user.email}</p>}
                     </div>
                     <div className="user-actions">
-                      <button 
+                      <span 
                         onClick={() => handleEdit(user)}
-                        className="edit-btn"
-                        disabled={loading}
+                        className="edit-icon"
                         title="Edit User"
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                         </svg>
-                      </button>
-                      <button 
+                      </span>
+                      <span 
                         onClick={() => handleDelete(user)}
-                        className="delete-btn"
-                        disabled={loading}
+                        className="delete-icon"
                         title="Delete User"
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
                         </svg>
-                      </button>
+                      </span>
                     </div>
                   </div>
                 ))}
