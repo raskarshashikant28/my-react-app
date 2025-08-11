@@ -83,7 +83,7 @@ body {
   gap: 15px;
 }
 
-.survey-icon {
+.app-icon {
   font-size: 4rem;
   margin-bottom: 10px;
 }
@@ -235,7 +235,7 @@ button[type="submit"]:disabled {
   gap: 15px;
 }
 
-.response-card {
+.user-card {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   padding: 15px;
   border-radius: 15px;
@@ -244,18 +244,18 @@ button[type="submit"]:disabled {
   transition: transform 0.2s ease;
 }
 
-.response-card:hover {
+.user-card:hover {
   transform: translateY(-2px);
 }
 
-.response-header {
+.user-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 10px;
 }
 
-.response-header h3 {
+.user-header h3 {
   color: #333;
   font-size: 1.1rem;
   flex: 1;
@@ -263,7 +263,7 @@ button[type="submit"]:disabled {
   margin-right: 10px;
 }
 
-.response-actions {
+.user-actions {
   display: flex;
   gap: 10px;
   flex-shrink: 0;
@@ -287,7 +287,7 @@ button[type="submit"]:disabled {
   transform: scale(1.2);
 }
 
-.response-details p {
+.user-details p {
   color: #666;
   margin-bottom: 5px;
   font-size: 0.9rem;
@@ -479,7 +479,7 @@ button[type="button"]:hover {
     padding: 18px;
   }
   
-  .response-card {
+  .user-card {
     padding: 18px;
   }
 }
@@ -503,16 +503,16 @@ button[type="button"]:hover {
     font-size: 1.2rem;
   }
   
-  .response-card {
+  .user-card {
     padding: 12px;
     margin-bottom: 12px;
   }
   
-  .response-header h3 {
+  .user-header h3 {
     font-size: 1rem;
   }
   
-  .response-details p {
+  .user-details p {
     font-size: 0.85rem;
   }
   
@@ -569,7 +569,7 @@ button[type="button"]:hover {
     font-size: 1.1rem;
   }
   
-  .response-card {
+  .user-card {
     padding: 10px;
   }
   
@@ -599,7 +599,7 @@ button[type="submit"]:disabled {
   -webkit-tap-highlight-color: transparent;
 }
 
-.response-card, .nav-btn, .edit-icon, .delete-icon, .refresh-icon {
+.user-card, .nav-btn, .edit-icon, .delete-icon, .refresh-icon {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;

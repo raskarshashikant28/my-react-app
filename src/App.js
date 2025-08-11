@@ -17,42 +17,42 @@ function App() {
 
   const texts = {
     en: {
-      welcome: 'Welcome to Survey App',
-      description: 'Complete surveys and view responses from all participants',
+      welcome: 'Welcome to My App',
+      description: 'Add your information and view all entries from users',
       username: 'Full Name',
       mobile: 'Mobile Number',
       email: 'Email Address',
-      submit: 'Submit Survey',
-      update: 'Update Response',
+      submit: 'Submit',
+      update: 'Update',
       cancel: 'Cancel',
       home: 'Home',
-      survey: 'Survey',
-      responses: 'Responses',
-      editUser: 'Edit Response',
-      surveyForm: 'Survey Form',
-      responseData: 'Survey Responses',
-      deleteConfirm: 'Are you sure you want to delete this response?',
-      deleteTitle: 'Delete Response',
+      form: 'Form',
+      list: 'List',
+      editUser: 'Edit Entry',
+      userForm: 'User Form',
+      userData: 'User Data',
+      deleteConfirm: 'Are you sure you want to delete this entry?',
+      deleteTitle: 'Delete Entry',
       yes: 'Yes, Delete',
       no: 'Cancel'
     },
     mr: {
-      welcome: 'सर्वेक्षण अॅपमध्ये आपले स्वागत आहे',
-      description: 'सर्वेक्षण पूर्ण करा आणि सर्व सहभागींचे प्रतिसाद पहा',
+      welcome: 'माझ्या अॅपमध्ये आपले स्वागत आहे',
+      description: 'आपली माहिती जोडा आणि सर्व वापरकर्त्यांच्या नोंदी पहा',
       username: 'पूर्ण नाव',
       mobile: 'मोबाइल नंबर',
       email: 'ईमेल पत्ता',
-      submit: 'सर्वेक्षण सबमिट करा',
-      update: 'प्रतिसाद अपडेट करा',
+      submit: 'सबमिट करा',
+      update: 'अपडेट करा',
       cancel: 'रद्द करा',
       home: 'होम',
-      survey: 'सर्वेक्षण',
-      responses: 'प्रतिसाद',
-      editUser: 'प्रतिसाद संपादित करा',
-      surveyForm: 'सर्वेक्षण फॉर्म',
-      responseData: 'सर्वेक्षण प्रतिसाद',
-      deleteConfirm: 'तुम्हाला खात्री आहे की तुम्ही हा प्रतिसाद हटवू इच्छिता?',
-      deleteTitle: 'प्रतिसाद हटवा',
+      form: 'फॉर्म',
+      list: 'यादी',
+      editUser: 'नोंद संपादित करा',
+      userForm: 'वापरकर्ता फॉर्म',
+      userData: 'वापरकर्ता डेटा',
+      deleteConfirm: 'तुम्हाला खात्री आहे की तुम्ही ही नोंद हटवू इच्छिता?',
+      deleteTitle: 'नोंद हटवा',
       yes: 'होय, हटवा',
       no: 'रद्द करा'
     }
@@ -136,7 +136,7 @@ function App() {
     <div className="app">
       <header className="header">
         <div className="header-content">
-          <h1>📊 Survey App</h1>
+          <h1>📱 My App</h1>
           <div className="language-toggle">
             <button 
               className={language === 'en' ? 'active' : ''}
@@ -148,7 +148,7 @@ function App() {
               className={language === 'mr' ? 'active' : ''}
               onClick={() => setLanguage('mr')}
             >
-              मर
+              मराठी
             </button>
           </div>
         </div>
@@ -158,17 +158,17 @@ function App() {
         {activeTab === 'home' && (
           <div className="home">
             <div className="welcome-content">
-              <div className="survey-icon">📋</div>
+              <div className="app-icon">📱</div>
               <h1>{t.welcome}</h1>
               <p>{t.description}</p>
               <div className="stats">
                 <div className="stat-item">
                   <span className="stat-number">{users.length}</span>
-                  <span className="stat-label">Total Responses</span>
+                  <span className="stat-label">Total Users</span>
                 </div>
                 <div className="stat-item">
                   <span className="stat-number">🌍</span>
-                  <span className="stat-label">Global Survey</span>
+                  <span className="stat-label">Global App</span>
                 </div>
               </div>
             </div>
@@ -177,7 +177,7 @@ function App() {
 
         {activeTab === 'form' && (
           <div className="form-section">
-            <h2>{editingUser ? t.editUser : t.surveyForm}</h2>
+            <h2>{editingUser ? t.editUser : t.userForm}</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label>{t.username}:</label>
@@ -230,7 +230,7 @@ function App() {
         {activeTab === 'view' && (
           <div className="view-section">
             <div className="view-header">
-              <h2>{t.responseData}</h2>
+              <h2>{t.userData}</h2>
               <span onClick={fetchUsers} className="refresh-icon" title="Refresh">
                 🔄
               </span>
@@ -238,17 +238,17 @@ function App() {
             {users.length === 0 ? (
               <div className="no-data">
                 <div className="no-data-icon">📝</div>
-                <p>No survey responses yet</p>
-                <p><small>Be the first to complete the survey!</small></p>
+                <p>No users added yet</p>
+                <p><small>Be the first to add your information!</small></p>
               </div>
             ) : (
               <div className="user-list">
                 {users.map(user => (
-                  <div key={user.id} className="response-card">
-                    <div className="response-info">
-                      <div className="response-header">
+                  <div key={user.id} className="user-card">
+                    <div className="user-info">
+                      <div className="user-header">
                         <h3>{user.username}</h3>
-                        <div className="response-actions">
+                        <div className="user-actions">
                           <span onClick={() => handleEdit(user)} className="edit-icon" title="Edit">
                             ✏️
                           </span>
@@ -257,7 +257,7 @@ function App() {
                           </span>
                         </div>
                       </div>
-                      <div className="response-details">
+                      <div className="user-details">
                         <p>📱 {user.mobile}</p>
                         {user.email && <p>📧 {user.email}</p>}
                       </div>
@@ -283,14 +283,14 @@ function App() {
           onClick={() => setActiveTab('form')}
         >
           <span className="icon">📝</span>
-          <span className="label">{t.survey}</span>
+          <span className="label">{t.form}</span>
         </button>
         <button 
           className={`nav-btn ${activeTab === 'view' ? 'active' : ''}`} 
           onClick={() => setActiveTab('view')}
         >
           <span className="icon">📊</span>
-          <span className="label">{t.responses}</span>
+          <span className="label">{t.list}</span>
         </button>
       </nav>
 
