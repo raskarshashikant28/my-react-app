@@ -18,6 +18,8 @@ body {
   margin: 0 auto;
   background: white;
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  width: 100%;
+  position: relative;
 }
 
 .header {
@@ -37,7 +39,8 @@ body {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
-  padding-bottom: 100px;
+  padding-bottom: 120px;
+  min-height: calc(100vh - 140px);
 }
 
 /* Home Section */
@@ -224,27 +227,58 @@ button[type="submit"]:disabled {
   background: #17a2b8;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
   margin-bottom: 20px;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
 }
 
 .refresh-btn:hover {
   background: #138496;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
 }
 
+.refresh-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.refresh-btn:hover svg {
+  transform: rotate(180deg);
+}
+
+/* Tablet Styles */
+@media (max-width: 768px) {
+  .app {
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  .content {
+    padding: 18px;
+  }
+  
+  .user-card {
+    padding: 18px;
+  }
+}
+
+/* Mobile Styles */
 @media (max-width: 480px) {
   .app {
     max-width: 100%;
+    margin: 0;
   }
   
   .content {
     padding: 15px;
-    padding-bottom: 120px;
+    padding-bottom: 130px;
   }
   
   .header {
@@ -257,14 +291,30 @@ button[type="submit"]:disabled {
   
   .user-card {
     padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .user-info h3 {
+    font-size: 1.1rem;
+  }
+  
+  .user-info p {
+    font-size: 0.9rem;
   }
   
   .user-actions {
     margin-top: 10px;
+    gap: 12px;
+  }
+  
+  .edit-btn, .delete-btn {
+    width: 36px;
+    height: 36px;
   }
   
   .bottom-nav {
     padding: 12px 0 25px 0;
+    max-width: 100%;
   }
   
   .nav-btn {
@@ -272,12 +322,40 @@ button[type="submit"]:disabled {
     padding: 8px 12px;
   }
   
-  .nav-btn .icon {
-    font-size: 1.6rem;
+  .nav-btn .label {
+    font-size: 0.65rem;
+  }
+  
+  .form-group input {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 360px) {
+  .content {
+    padding: 12px;
+  }
+  
+  .header {
+    padding: 12px;
+  }
+  
+  .header h1 {
+    font-size: 1.2rem;
+  }
+  
+  .user-card {
+    padding: 12px;
+  }
+  
+  .nav-btn {
+    min-width: 50px;
+    padding: 6px 8px;
   }
   
   .nav-btn .label {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
   }
 }
 
@@ -366,8 +444,31 @@ button[type="submit"]:disabled {
   100% { opacity: 1; }
 }
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 button[type="submit"]:disabled {
   animation: pulse 1.5s infinite;
+}
+
+.edit-btn:disabled, .delete-btn:disabled {
+  animation: pulse 1.5s infinite;
+}
+
+/* Smooth transitions */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.user-card, .nav-btn, .edit-btn, .delete-btn, .refresh-btn {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 /* Cancel button styling */

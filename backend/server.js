@@ -39,6 +39,37 @@ app.post('/api/users', (req, res) => {
   }
 });
 
+// Delete user
+app.delete('/api/users/:id', (req, res) => {
+  try {
+    const data = fs.readFileSync(DATA_FILE, 'utf8');
+    const users = JSON.parse(data);
+    const filteredUsers = users.filter(user => user.id != req.params.id);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(filteredUsers, null, 2));
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
+
+// Update user
+app.put('/api/users/:id', (req, res) => {
+  try {
+    const data = fs.readFileSync(DATA_FILE, 'utf8');
+    const users = JSON.parse(data);
+    const userIndex = users.findIndex(user => user.id == req.params.id);
+    if (userIndex !== -1) {
+      users[userIndex] = { ...users[userIndex], ...req.body };
+      fs.writeFileSync(DATA_FILE, JSON.stringify(users, null, 2));
+      res.json(users[userIndex]);
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
