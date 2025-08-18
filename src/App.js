@@ -208,6 +208,7 @@ function App() {
                   onChange={handleInputChange}
                 />
               </div>
+              <div className="button-group">
               <button type="submit" disabled={loading}>
                 {loading ? '⏳' : (editingUser ? t.update : t.submit)}
               </button>
@@ -218,11 +219,12 @@ function App() {
                     setEditingUser(null);
                     setFormData({ username: '', mobile: '', email: '' });
                   }}
-                  style={{marginLeft: '10px', background: '#6c757d'}}
+                  style={{marginTop: '15px', background: '#6c757d'}}
                 >
                   {t.cancel}
                 </button>
               )}
+              </div>
             </form>
           </div>
         )}
